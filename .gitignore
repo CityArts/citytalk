@@ -2,3 +2,5 @@
 /target
 **/*.rs.bk
 bot.toml
+.DS_Store
+Cargo.lock
