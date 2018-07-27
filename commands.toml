@@ -15,8 +15,10 @@ City:Talk {VERSION}\n\
 - /stop  : Stop City:Talk Services\n\
 - /help  : Display command list\n\
 - /status : Display server status\n\
+- /ch [TEXT] : Send message to minecraft\n\
 - /add [USERNAME] : Register whitelist to server\n\
 - /remove [USERNAME] : Unregister whitelist to server\n\
+- /rcon [COMMAND] : [ADMIN ONLY] Execute RCON\n\
 - /map   : Display server's map\n\
     """],
 	["status", """
@@ -42,6 +44,9 @@ Successful! : {OUTPUT}\n\
     ["rcon_err", """
 / RCON /\n\
 ADMIN ONLY\n\
+    """],
+    ["chat", """
+Chat! {OUTPUT}\n\
     """],
 ]
 

@@ -4,3 +4,4 @@
 bot.toml
 .DS_Store
 Cargo.lock
+log

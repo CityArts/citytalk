@@ -129,18 +129,40 @@ impl TGBot {
     fn rcon(api: Api, message: Message, handle: &Handle, parameter: String) {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
+        let msg = message.clone();
 
         let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err"))
             .parse_mode(ParseMode::Html)
         );
 
-        if TGBot::check_admin(message.from.id.to_string()) {
-            let mut client =   Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
+        if TGBot::check_admin(msg.from.id.to_string()) {
+            info!("{}", format!("'/ch' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
+
+            let mut client = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
             let _ = client.send_auth();
             html = api.send(message.text_reply(TGBot::parse_reply("rcon").replace("{OUTPUT}", &client.send_command(&parameter)))
                 .parse_mode(ParseMode::Html)
             );
         }
+        
+        handle.spawn({
+            let future = html;
+            future.map_err(|_| ()).map(|_| ())
+        })
+    }
+
+    fn ch(api: Api, message: Message, handle: &Handle, parameter: String) {
+        let conf: Config = unsafe { ::CONF.clone() };
+        let server_conf: ServerConfig = conf.server.unwrap();
+        let msg = message.clone();
+
+        info!("{}", format!("'/ch' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
+
+        let mut client = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
+        let _ = client.send_auth();
+        let html = api.send(message.text_reply(TGBot::parse_reply("chat").replace("{OUTPUT}", &client.send_command(&format!("{}[§cT§6a§el§ak§f] {} : {}{}", r#"tellraw @a {"text":""#, msg.from.first_name, parameter, r#""}"#))))
+            .parse_mode(ParseMode::Html)
+        );
         
         handle.spawn({
             let future = html;
@@ -161,8 +183,11 @@ pub fn bot(api: Api, message: Message, handle: &Handle) {
             if matches.is_empty() {
                 return
             } else {
-                let matches: Vec<&str> = data.as_str().matches("@").collect();
-                let msg: Vec<&str> = data.split(|c| c == '/' || c == '@' || c == ' ').collect();
+                let matches: Vec<&str> = data.split_whitespace().nth(0).unwrap().matches("@").collect();
+                let mut msg: Vec<&str> = data.split_whitespace().nth(0).unwrap().split(|c| c == '/' || c == '@').collect();
+                let mut space_msg: Vec<&str> = data.split_whitespace().collect();
+                space_msg.remove(0);
+                msg.extend(space_msg);
                 
                 if !matches.is_empty() {
                     parameter = if msg.len() >= 4 { 
@@ -189,6 +214,7 @@ pub fn bot(api: Api, message: Message, handle: &Handle) {
                     "add" => TGBot::add,
                     "remove" => TGBot::remove,
                     "rcon" => TGBot::rcon,
+                    "ch" => TGBot::ch,
                     _ => return,
                 }
             }

@@ -13,6 +13,9 @@
 #[macro_use]
 extern crate serde_derive;
 
+#[macro_use]
+extern crate log;
+
 extern crate telegram_bot;
 extern crate tokio_core;
 extern crate futures;
@@ -21,6 +24,8 @@ extern crate serde_json;
 extern crate reqwest;
 extern crate rand;
 extern crate byteorder;
+extern crate simple_logging;
+extern crate chrono;
 
 mod conf;
 mod bot;
@@ -28,9 +33,13 @@ mod mcapi;
 mod rcon;
 
 //* Use from external library *//
+use std::fs;
+use std::path::Path;
 use futures::Stream;
 use tokio_core::reactor::Core;
 use telegram_bot::{Api, UpdateKind};
+use log::LevelFilter;
+use chrono::prelude::*;
 
 //* Use from local library *//
 use conf::{read_conf, read_commands};
@@ -59,5 +68,8 @@ fn main() {
         Ok(())
     });
 
+    if !Path::new("log").exists() { fs::create_dir("log").unwrap() };
+
+    simple_logging::log_to_file(&format!("log/bot-{}", Local::now().to_rfc3339()), LevelFilter::Info).unwrap();
     core.run(future).unwrap();
 }
