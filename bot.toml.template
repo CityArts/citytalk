@@ -1,0 +1,13 @@
+[telegram]
+bot_api = "TELEGRAM BOT TOKEN HERE"
+admins = [
+    "ADMINS HERE"
+]
+main_group_id = "MAIN GROUP ID HERE
+username = "@example_bot"
+[server]
+address = "SERVER ADDRESS HERE"
+port = "25565"
+rcon_address = "SERVER ADDRESS HERE"
+rcon_port = "25575"
+rcon_pass = "example"

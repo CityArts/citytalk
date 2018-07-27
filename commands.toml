@@ -1,0 +1,48 @@
+first_msg = "<b>City:Talk</b>\n"
+commands = [
+	["start", """
+Hello, this is a City:Talk.\n\
+If you need help, please use command '/help'\n\
+Thank you for using City:Talk :)\n\
+    """],
+	["stop", """
+Stopping City:Talk Services... [OK]\
+    """],
+	["help", """
+/ Command List /\n\
+City:Talk {VERSION}\n\
+- /start : Start City:Talk Services\n\
+- /stop  : Stop City:Talk Services\n\
+- /help  : Display command list\n\
+- /status : Display server status\n\
+- /add [USERNAME] : Register whitelist to server\n\
+- /remove [USERNAME] : Unregister whitelist to server\n\
+- /map   : Display server's map\n\
+    """],
+	["status", """
+/ Server Status /\n\
+MINECRAFT ({SERVER_VERSION}) : {SERVER_STATUS} ({SERVER_USERS})\n\
+    """],
+    ["add", """
+/ Add whitelist /\n\
+Successful! : {OUTPUT}\n\
+    """],
+    ["remove", """
+/ Remove whitelist /\n\
+Successful! : {OUTPUT}\n\
+    """],
+    ["remove_err", """
+/ Remove whitelist /\n\
+ADMIN ONLY\n\
+    """],
+    ["rcon", """
+/ RCON /\n\
+Successful! : {OUTPUT}\n\
+    """],
+    ["rcon_err", """
+/ RCON /\n\
+ADMIN ONLY\n\
+    """],
+]
+
+
