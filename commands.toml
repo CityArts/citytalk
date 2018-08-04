@@ -25,6 +25,10 @@ City:Talk {VERSION}\n\
 / Server Status /\n\
 MINECRAFT ({SERVER_VERSION}) : {SERVER_STATUS} ({SERVER_USERS})\n\
     """],
+    ["status_err", """
+/ Server Status /\n\
+ERR : Can't connect to server :(\n\
+    """],
     ["add", """
 / Add whitelist /\n\
 Successful! : {OUTPUT}\n\
@@ -44,6 +48,10 @@ Successful! : {OUTPUT}\n\
     ["rcon_err", """
 / RCON /\n\
 ADMIN ONLY\n\
+    """],
+    ["rcon_err2", """
+/ RCON /\n\
+ERR : Can't connect to server :(\n\
     """],
     ["chat", """
 Chat! {OUTPUT}\n\

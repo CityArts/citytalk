@@ -71,16 +71,21 @@ impl TGBot {
     }
 
     fn status(api: Api, message: Message, handle: &Handle, _parameter: String) {
-        let mcapi: MCApi = MCApi::new();
-        let server: Server = mcapi.server.unwrap();
-        let players: Players = mcapi.players.unwrap();
-
-        let html = api.send(message.text_reply(TGBot::parse_reply("status")
-            .replace("{SERVER_VERSION}", &server.name.unwrap())
-            .replace("{SERVER_STATUS}", if mcapi.online.unwrap() { "✅" } else { "❎" })
-            .replace("{SERVER_USERS}", &format!("{} / {}", players.now.unwrap(), players.max.unwrap())))
+        let mut html = api.send(message.text_reply(TGBot::parse_reply("status_err"))
             .parse_mode(ParseMode::Html)
         );
+        
+        if let Ok(mcapi) = MCApi::new() {
+            let server: Server = mcapi.server.unwrap();
+            let players: Players = mcapi.players.unwrap();
+
+            html = api.send(message.text_reply(TGBot::parse_reply("status")
+                .replace("{SERVER_VERSION}", &server.name.unwrap())
+                .replace("{SERVER_STATUS}", if mcapi.online.unwrap() { "✅" } else { "❎" })
+                .replace("{SERVER_USERS}", &format!("{} / {}", players.now.unwrap(), players.max.unwrap())))
+                .parse_mode(ParseMode::Html)
+            );
+        }
         
         handle.spawn({
             let future = html;
@@ -91,12 +96,16 @@ impl TGBot {
     fn add(api: Api, message: Message, handle: &Handle, parameter: String) {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
-
-        let mut client =   Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
-        let _ = client.send_auth();
-        let html = api.send(message.text_reply(TGBot::parse_reply("add").replace("{OUTPUT}", &client.send_command(&format!("whitelist add {}", parameter))))
+        let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
             .parse_mode(ParseMode::Html)
         );
+
+        if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
+            let _ = client.send_auth();
+            html = api.send(message.text_reply(TGBot::parse_reply("add").replace("{OUTPUT}", &client.send_command(&format!("whitelist add {}", parameter))))
+                .parse_mode(ParseMode::Html)
+            );
+        }
         
         handle.spawn({
             let future = html;
@@ -107,13 +116,11 @@ impl TGBot {
     fn remove(api: Api, message: Message, handle: &Handle, parameter: String) {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
-
-        let mut html = api.send(message.text_reply(TGBot::parse_reply("remove_err"))
+        let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
             .parse_mode(ParseMode::Html)
         );
 
-        if TGBot::check_admin(message.from.id.to_string()) {
-            let mut client =   Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
+        if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
             let _ = client.send_auth();
             html = api.send(message.text_reply(TGBot::parse_reply("remove").replace("{OUTPUT}", &client.send_command(&format!("whitelist remove {}", parameter))))
                 .parse_mode(ParseMode::Html)
@@ -136,13 +143,19 @@ impl TGBot {
         );
 
         if TGBot::check_admin(msg.from.id.to_string()) {
-            info!("{}", format!("'/ch' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
+            info!("{}", format!("'/rcon' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
 
-            let mut client = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
-            let _ = client.send_auth();
-            html = api.send(message.text_reply(TGBot::parse_reply("rcon").replace("{OUTPUT}", &client.send_command(&parameter)))
+            html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
                 .parse_mode(ParseMode::Html)
             );
+
+            if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
+                println!("{:?}", client);
+                let _ = client.send_auth().unwrap();
+                html = api.send(message.text_reply(TGBot::parse_reply("rcon").replace("{OUTPUT}", &client.send_command(&parameter)))
+                    .parse_mode(ParseMode::Html)
+                );
+            }
         }
         
         handle.spawn({
@@ -155,14 +168,18 @@ impl TGBot {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
         let msg = message.clone();
+        let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
+            .parse_mode(ParseMode::Html)
+        );
 
         info!("{}", format!("'/ch' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
 
-        let mut client = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap());
-        let _ = client.send_auth();
-        let html = api.send(message.text_reply(TGBot::parse_reply("chat").replace("{OUTPUT}", &client.send_command(&format!("{}[§cT§6a§el§ak§f] {} : {}{}", r#"tellraw @a {"text":""#, msg.from.first_name, parameter, r#""}"#))))
-            .parse_mode(ParseMode::Html)
-        );
+        if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
+            let _ = client.send_auth();
+            html = api.send(message.text_reply(TGBot::parse_reply("chat").replace("{OUTPUT}", &client.send_command(&format!("{}[§cT§6a§el§ak§f] {} : {}{}", r#"tellraw @a {"text":""#, msg.from.first_name, parameter, r#""}"#))))
+                .parse_mode(ParseMode::Html)
+            );
+        }
         
         handle.spawn({
             let future = html;

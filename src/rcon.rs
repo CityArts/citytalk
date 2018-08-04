@@ -19,12 +19,14 @@ const SERVERDATA_EXECOMMAND: i32 = 2;
 const SERVERDATA_AUTH: i32 = 3;
 
 //* Use from external library *//
+use std::mem;
 use std::str;
 use std::io::prelude::*;
 use std::net::TcpStream;
 use rand::prelude::*;
 use byteorder::{WriteBytesExt, ByteOrder, LittleEndian};
 
+#[derive(Debug)]
 pub struct Client {
     pub host: String,
     pub port: String,
@@ -41,14 +43,17 @@ pub struct Payload {
 }
 
 impl Client {
-    pub fn new(host: String, port: String, password: String) -> Self {
+    pub fn new(host: String, port: String, password: String) -> Result<Self, ()> {
         let (host_tmp, port_tmp) = { (host.clone(), port.clone()) };
-
-        Self {
-            host: host,
-            port: port,
-            password: password,
-            stream: TcpStream::connect(&format!("{}:{}", host_tmp, port_tmp)).unwrap()
+        if let Ok(s) = TcpStream::connect(&format!("{}:{}", host_tmp, port_tmp)) {
+            Ok(Self {
+                host: host,
+                port: port,
+                password: password,
+                stream: s
+            })
+        } else {
+            Err(unsafe { mem::zeroed() })
         }
     }
 
@@ -56,7 +61,8 @@ impl Client {
         let payload = Payload::new(SERVERDATA_EXECOMMAND, command.as_bytes().to_vec());
         let response = self.send_payload(payload);
         let mut body = response.body;
-        body.retain(|&x| x != NULL as u8);
+        let _ = body.retain(|&x| x != NULL as u8);
+
         String::from_utf8(body).unwrap()
     }
 

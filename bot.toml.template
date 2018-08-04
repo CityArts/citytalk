@@ -3,8 +3,8 @@ bot_api = "TELEGRAM BOT TOKEN HERE"
 admins = [
     "ADMINS HERE"
 ]
-main_group_id = "MAIN GROUP ID HERE
-username = "@example_bot"
+main_group_id = "MAIN GROUP ID HERE"
+username = "example_bot"
 [server]
 address = "SERVER ADDRESS HERE"
 port = "25565"

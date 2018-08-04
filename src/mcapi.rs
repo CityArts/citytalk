@@ -6,6 +6,7 @@
 // =======================================================================
 
 //* Use from local library *//
+use std::mem;
 use conf::{Config, ServerConfig};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -35,11 +36,14 @@ pub struct Server {
 }
 
 impl MCApi {
-    pub fn new() -> Self {
+    pub fn new() -> Result<Self, ()> {
         let conf: Config = unsafe { ::CONF.clone() };
         let conf_server: ServerConfig = conf.server.unwrap();
 
-        let res: Self = reqwest::get(&format!("https://mcapi.us/server/status?ip={}", conf_server.address.unwrap())).unwrap().json().unwrap();
-        res
+        if let Ok(mut res) = reqwest::get(&format!("https://mcapi.us/server/status?ip={}", conf_server.address.unwrap())) {
+            Ok(res.json().unwrap())
+        } else {
+            Err(unsafe { mem::zeroed() })
+        }
     }
 }
