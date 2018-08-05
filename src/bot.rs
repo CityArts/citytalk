@@ -96,9 +96,12 @@ impl TGBot {
     fn add(api: Api, message: Message, handle: &Handle, parameter: String) {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
+        let msg = message.clone();
         let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
             .parse_mode(ParseMode::Html)
         );
+
+        info!("{}", format!("'/add' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
 
         if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
             let _ = client.send_auth();
@@ -116,9 +119,12 @@ impl TGBot {
     fn remove(api: Api, message: Message, handle: &Handle, parameter: String) {
         let conf: Config = unsafe { ::CONF.clone() };
         let server_conf: ServerConfig = conf.server.unwrap();
+        let msg = message.clone();
         let mut html = api.send(message.text_reply(TGBot::parse_reply("rcon_err2"))
             .parse_mode(ParseMode::Html)
         );
+
+        info!("{}", format!("'/add' command issued by {}({}). parameter is '{}'", msg.from.first_name, msg.from.id, parameter));
 
         if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
             let _ = client.send_auth();
@@ -150,7 +156,6 @@ impl TGBot {
             );
 
             if let Ok(mut client) = Client::new(server_conf.rcon_address.unwrap(), server_conf.rcon_port.unwrap(), server_conf.rcon_pass.unwrap()) {
-                println!("{:?}", client);
                 let _ = client.send_auth().unwrap();
                 html = api.send(message.text_reply(TGBot::parse_reply("rcon").replace("{OUTPUT}", &client.send_command(&parameter)))
                     .parse_mode(ParseMode::Html)
