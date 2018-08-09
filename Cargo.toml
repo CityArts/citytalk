@@ -5,6 +5,7 @@ authors = ["xuserwhat <quickn@cityarts.cf>"]
 
 [dependencies]
 telegram-bot = { git = "https://github.com/telegram-rs/telegram-bot.git" }
+rcon-rs = { git = "https://github.com/CityArts/rcon-rs.git" }
 tokio-core = "0.1"
 futures = "0.1"
 toml = "0.4"
@@ -12,8 +13,6 @@ serde = "1.0.55"
 serde_derive = "1.0.55"
 serde_json = "1.0"
 reqwest = "0.8.6"
-rand = "0.5"
-byteorder = "1"
 simple-logging = "2.0.1"
 log = "0.4.3"
 chrono = "0.4"

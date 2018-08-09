@@ -22,15 +22,13 @@ extern crate futures;
 extern crate toml;
 extern crate serde_json;
 extern crate reqwest;
-extern crate rand;
-extern crate byteorder;
 extern crate simple_logging;
 extern crate chrono;
+extern crate rcon_rs;
 
 mod conf;
 mod bot;
 mod mcapi;
-mod rcon;
 
 //* Use from external library *//
 use std::fs;

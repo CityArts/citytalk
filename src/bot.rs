@@ -14,7 +14,7 @@ use telegram_bot::prelude::*;
 //* Use from local library *//
 use conf::{Config, Commands, Command, TelegramConfig, ServerConfig};
 use mcapi::{MCApi, Server, Players};
-use rcon::Client;
+use rcon_rs::Client;
 
 pub struct TGBot;
 
